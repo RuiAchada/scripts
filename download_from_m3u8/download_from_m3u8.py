@@ -1,6 +1,7 @@
 import subprocess
 import logging
 import json
+import time
 
 # Set up logging
 logging.basicConfig(
@@ -12,13 +13,13 @@ logging.basicConfig(
     ]
 )
 
-def load_headers_from_file(file_path):
+def load_settings_from_file(file_path):
     try:
         with open(file_path, 'r') as f:
             settings = json.load(f)
-            return settings.get('headers', {})
+            return settings
     except Exception as e:
-        logging.error(f"Failed to load headers from settings file: {e}")
+        logging.error(f"Failed to load settings from file: {e}")
         return {}
 
 def download_hls_stream(manifest_url, headers, output_filename):
@@ -42,12 +43,25 @@ def download_hls_stream(manifest_url, headers, output_filename):
         logging.error(f"An unexpected error occurred: {e}")
 
 if __name__ == "__main__":
-    manifest_url = input("Enter the manifest URL (e.g., .m3u8 file URL): ")
-    output_filename = input("Enter the output filename (e.g., video.mp4): ")
+    # Load settings from the settings.json file
+    settings = load_settings_from_file('settings.json')
+
+    # Check for a local manifest file path in the settings
+    manifest_url = settings.get('manifest_url', None)
+    if not manifest_url:
+        manifest_url = input("Enter the manifest URL (e.g., .m3u8 file URL): ")
+
+    # Check for an output filename in the settings
+    output_filename = settings.get('output_filename', None)
+    if not output_filename:
+        # Generate the output filename with the current timestamp
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        output_filename = input(f"Enter the output filename (default: video_{timestamp}.mp4): ")
+        if not output_filename:
+            output_filename = f"video_{timestamp}.mp4"
 
     # Load headers from the settings file
-    headers = load_headers_from_file('settings.json')
-
+    headers = settings.get('headers', {})
     if not headers:
         logging.error("No headers found. Please check the settings file.")
     elif not manifest_url:
