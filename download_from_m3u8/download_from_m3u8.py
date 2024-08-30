@@ -1,5 +1,6 @@
 import subprocess
 import logging
+import json
 
 # Set up logging
 logging.basicConfig(
@@ -10,6 +11,15 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+def load_headers_from_file(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            settings = json.load(f)
+            return settings.get('headers', {})
+    except Exception as e:
+        logging.error(f"Failed to load headers from settings file: {e}")
+        return {}
 
 def download_hls_stream(manifest_url, headers, output_filename):
     # Construct the ffmpeg command
@@ -35,23 +45,12 @@ if __name__ == "__main__":
     manifest_url = input("Enter the manifest URL (e.g., .m3u8 file URL): ")
     output_filename = input("Enter the output filename (e.g., video.mp4): ")
 
-    # Headers extracted from the cURL command (these are the headers for a specific website, you may need to change them)
-    headers = {
-        'Accept': '*/*',
-        'Accept-Language': 'pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Connection': 'keep-alive',
-        'Origin': 'https://vidmoly.to',
-        'Referer': 'https://vidmoly.to/',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'cross-site',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
-        'sec-ch-ua': '"Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"'
-    }
+    # Load headers from the settings file
+    headers = load_headers_from_file('settings.json')
 
-    if not manifest_url:
+    if not headers:
+        logging.error("No headers found. Please check the settings file.")
+    elif not manifest_url:
         logging.error("The manifest URL cannot be empty.")
     elif not output_filename:
         logging.error("The output filename cannot be empty.")
