@@ -23,12 +23,15 @@ def load_settings_from_file(file_path):
         return {}
 
 def download_hls_stream(manifest_url, headers, output_filename):
-    # Construct the ffmpeg command
+    # Prepare the headers string for ffmpeg
+    headers_string = '\r\n'.join([f'{key}: {value}' for key, value in headers.items()])
+    
+    # Construct the ffmpeg command with the headers applied to all requests
     ffmpeg_command = [
         'ffmpeg',
-        '-headers', '\r\n'.join([f'{key}: {value}' for key, value in headers.items()]),
-        '-i', manifest_url,
-        '-c', 'copy',
+        '-headers', headers_string,  # Set headers for the initial request
+        '-i', manifest_url,  # The manifest URL (master.m3u8)
+        '-c', 'copy',  # Copy the codecs without re-encoding
         output_filename
     ]
     

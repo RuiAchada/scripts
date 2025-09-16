@@ -1,0 +1,19 @@
+{
+	"manifest_url": "https://tmstr.luminousstreamhaven.com/stream_new/H4sIAAAAAAAAAw3Db3OCIBwA4K8Eorvcu1mS.YdOFH_COxAbEytvq1V..u25e0yITxZFZoj_kzHYjPFpY96GzRCEhsTkvQnUo8ILhZaXx865puVbleJpzIaHPedu6NWv6Oi93d.aVhzCclVzS9wNJpdxbEFTK.uLygp8eAxeMZZdQw3xvqV5YaB.Hbc_3_xCA06XpPJ5zXZzL2fGmbii8bxUI_hXJRwuyfxs_HwXAfuSHa8MSZ9iG2MJNlfe9oJYX4sIDLJazxR1KHxB6lLWJZGGfOET1_X6Gdr1I4Isd.DlOgquLVoOIJ5FjSrc9LYpCb91vURilySWSPIHSg2skyEBAAA-/iframes-2.m3u8",
+	"output_filename": "",
+	"headers": {
+		"sec-ch-ua": "\"Chromium\";v=\"128\", \"Not;A=Brand\";v=\"24\", \"Google Chrome\";v=\"128\"",
+		"sec-ch-ua-mobile": "?0",
+		"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+		"sec-ch-ua-platform": "\"Windows\"",
+		"accept": "*/*",
+		"origin": "https://whisperingauroras.com",
+		"sec-fetch-site": "cross-site",
+		"sec-fetch-mode": "cors",
+		"sec-fetch-dest": "empty",
+		"referer": "https://whisperingauroras.com/",
+		"accept-encoding": "gzip, deflate, zstd",
+		"accept-language": "pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+		"priority": "u=1, i"
+	}
+}
