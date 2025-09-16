@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BTC: Wait 1 Year vs Buy the Dip — With Original Deposit</title>
+<style>
+  :root{
+    --bg:#0f1220; --card:#171a2b; --ink:#eef1ff; --muted:#9aa3b2;
+    --accent:#7aa0ff; --good:#36d399; --bad:#ff6b6b; --border:rgba(255,255,255,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Inter,Ubuntu,Arial}
+  .wrap{max-width:980px;margin:0 auto;padding:28px}
+  h1{margin:0 0 8px;font-size:28px;letter-spacing:.2px}
+  p.lead{margin:0 0 20px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .col-12{grid-column:span 12}
+  .col-6{grid-column:span 6}
+  @media (max-width:900px){.col-6{grid-column:span 12}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+  label{display:block;font-weight:600;margin:0 0 6px;color:#cbd3ff}
+  input{
+    width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);
+    background:#0f1324;color:var(--ink);outline:none;font-size:15px;
+  }
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(122,160,255,.25)}
+  .hint{color:var(--muted);font-size:12px;margin-top:6px}
+  .results{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:stretch}
+  .stat{grid-column:span 12;background:#10142a;border:1px solid var(--border);border-radius:14px;padding:16px}
+  .stat h3{margin:0 0 8px;font-size:13px;color:#c9d2f5;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+  .stat .val{font-size:22px;font-weight:700}
+  .mono{font-variant-numeric:tabular-nums}
+  .good{color:var(--good)} .bad{color:var(--bad)}
+  .row{display:flex;gap:16px;flex-wrap:wrap}
+  .mini{font-size:13px;color:#cbd3ff;margin-top:10px}
+  .mini .line{display:flex;justify-content:space-between;margin:4px 0}
+  .muted{color:var(--muted)}
+  .button{
+    display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);background:#11152b;
+    color:var(--ink);padding:10px 14px;border-radius:12px;text-decoration:none;cursor:pointer;margin-top:8px;
+  }
+  .button:hover{border-color:#2a335a}
+  .toggle{display:flex;align-items:center;gap:10px;margin-top:10px}
+  .toggle input{width:auto}
+  code{background:#0e1222;padding:2px 6px;border-radius:6px;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>BTC: Wait 1 Year vs Buy the Dip — With Original Deposit</h1>
+    <p class="lead">
+      Compare: <strong>A)</strong> Wait 1 year on stables (tax-exempt) vs <strong>B)</strong> Buy the dip → sell → withdraw now (taxed).
+      Include your <strong>original fiat deposit</strong> to tax the profit correctly in Scenario B.
+    </p>
+
+    <!-- Inputs -->
+    <div class="grid">
+      <div class="col-6">
+        <div class="card">
+          <label>Currency symbol</label>
+          <input id="currency" value="€" maxlength="3" />
+          <div class="hint">Only for display (€, $, £…)</div>
+
+          <div style="height:12px"></div>
+
+          <label>Original fiat deposit (your cost basis)</label>
+          <input id="deposit" type="number" step="100" min="0" value="10000" />
+          <div class="hint">Example: you started with €10,000 deposited to the exchange</div>
+
+          <div style="height:12px"></div>
+
+          <label>Current stables after selling BTC</label>
+          <input id="stables" type="number" step="100" min="0" value="50000" />
+          <div class="hint">This is the starting amount for both scenarios (e.g., €50,000 in stables)</div>
+
+          <div style="height:12px"></div>
+
+          <div class="row">
+            <div style="flex:1;min-width:220px">
+              <label>Dip buy price (BTC)</label>
+              <input id="dip" type="number" step="100" min="1" value="40000" />
+              <div class="hint">Scenario B: price where you buy back BTC</div>
+            </div>
+            <div style="flex:1;min-width:220px">
+              <label>Future sell price (BTC)</label>
+              <input id="future" type="number" step="100" min="0" value="60000" />
+              <div class="hint">Scenario B: price where you later sell (then withdraw immediately)</div>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <label>Tax rate on gains (decimal)</label>
+          <input id="tax" type="number" step="0.01" min="0" max="1" value="0.28" />
+          <div class="hint">Use decimal (0.28 = 28%)</div>
+
+          <div class="toggle">
+            <input id="modeTotal" type="checkbox" checked />
+            <label for="modeTotal" style="margin:0">Scenario B tax mode: <strong>Tax profit since original deposit</strong></label>
+          </div>
+          <div class="hint">
+            Off = tax only the current trade’s gain (<code>gross - stables</code>). On = tax total profit since your original deposit (<code>gross - deposit</code>).
+          </div>
+
+          <button class="button" id="reset">Reset defaults</button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="col-6">
+        <div class="card">
+          <div class="results">
+            <!-- Scenario A -->
+            <div class="stat">
+              <h3>Scenario A — Wait 1 Year on Stables (Tax-Exempt)</h3>
+              <div class="val mono" id="a_final">—</div>
+              <div class="mini">
+                <div class="line"><span class="muted">Final withdrawal (no tax):</span><span class="mono" id="a_details">—</span></div>
+              </div>
+            </div>
+
+            <!-- Scenario B -->
+            <div class="stat">
+              <h3>Scenario B — Buy Dip → Sell → Withdraw Now (Taxed)</h3>
+              <div class="val mono" id="b_final">—</div>
+              <div class="mini">
+                <div class="line"><span class="muted">BTC bought at dip:</span><span class="mono" id="b_btc">—</span></div>
+                <div class="line"><span class="muted">Gross value at sell:</span><span class="mono" id="b_gross">—</span></div>
+                <div class="line"><span class="muted">Taxable gain basis:</span><span class="mono" id="b_basis">—</span></div>
+                <div class="line"><span class="muted">Taxable gain:</span><span class="mono" id="b_gain">—</span></div>
+                <div class="line"><span class="muted">Tax (@ rate):</span><span class="mono" id="b_tax">—</span></div>
+                <div class="line"><span class="muted">Final after tax (withdrawn):</span><span class="mono" id="b_net">—</span></div>
+              </div>
+            </div>
+
+            <!-- Comparison -->
+            <div class="stat">
+              <h3>Comparison vs Scenario A</h3>
+              <div class="val mono" id="diff">—</div>
+              <div class="hint" id="diff_hint">Extra vs Scenario A (positive = Dip better)</div>
+            </div>
+          </div>
+
+          <div class="mini muted">
+            Notes:<br>
+            • Scenario A assumes your final conversion to EUR is after ≥365 days on that stablecoin lot → tax-exempt.<br>
+            • Scenario B taxes either (1) the <em>current trade’s</em> gain (<code>gross - stables</code>) or (2) your <em>total profit since original deposit</em> (<code>gross - deposit</code>), depending on the toggle.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  // Inputs
+  const currEl   = $("currency");
+  const depEl    = $("deposit");
+  const stablesEl= $("stables");
+  const dipEl    = $("dip");
+  const futureEl = $("future");
+  const taxEl    = $("tax");
+  const modeTotal= $("modeTotal");
+  const resetBtn = $("reset");
+
+  // Outputs A
+  const aFinal = $("a_final");
+  const aDetails = $("a_details");
+
+  // Outputs B
+  const bFinal = $("b_final");
+  const bBTC   = $("b_btc");
+  const bGross = $("b_gross");
+  const bBasis = $("b_basis");
+  const bGain  = $("b_gain");
+  const bTax   = $("b_tax");
+  const bNet   = $("b_net");
+
+  // Compare
+  const diffEl = $("diff");
+  const diffHint = $("diff_hint");
+
+  const defaults = {
+    currency: "€",
+    deposit: 10000,
+    stables: 50000,
+    dip: 40000,
+    future: 60000,
+    tax: 0.28,
+    modeTotal: true
+  };
+
+  function toNum(el, fb=0){ const v = parseFloat(el.value); return Number.isFinite(v) ? v : fb; }
+  function currencyCode(sym){
+    return sym === "€" ? "EUR" : sym === "$" ? "USD" : sym === "£" ? "GBP" : "EUR";
+  }
+  function fmt(n, sym){
+    try{
+      return new Intl.NumberFormat(undefined, {
+        style: "currency", currency: currencyCode(sym), currencyDisplay: "symbol", maximumFractionDigits: 2
+      }).format(n);
+    }catch{
+      return sym + String((+n).toFixed(2)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+  }
+
+  function calc(){
+    const sym    = currEl.value || defaults.currency;
+    const deposit= Math.max(0, toNum(depEl, defaults.deposit));
+    const stables= Math.max(0, toNum(stablesEl, defaults.stables));
+    const dip    = Math.max(0.00000001, toNum(dipEl, defaults.dip));
+    const future = Math.max(0, toNum(futureEl, defaults.future));
+    const taxRate= Math.min(1, Math.max(0, toNum(taxEl, defaults.tax)));
+    const useTotal= !!modeTotal.checked;
+
+    // Scenario A: wait 1 year on stables (tax-exempt)
+    const a_withdraw = stables;
+    aFinal.textContent = fmt(a_withdraw, sym);
+    aDetails.textContent = fmt(stables, sym);
+
+    // Scenario B: buy dip, sell, withdraw now (taxed)
+    const btcBought = stables / dip;
+    const grossAtSell = btcBought * future;
+
+    // Two possible tax bases:
+    //   current-trade gain: gross - stables
+    //   total profit since original deposit: gross - deposit
+    const basisLabel = useTotal ? "Total profit since deposit" : "Current trade gain";
+    const taxableGain = Math.max(0, (useTotal ? (grossAtSell - deposit) : (grossAtSell - stables)));
+    const tax = taxableGain * taxRate;
+    const netAfterTax = grossAtSell - tax;
+
+    // Write B
+    bFinal.textContent = fmt(netAfterTax, sym);
+    bBTC.textContent   = `${btcBought.toFixed(6)} BTC`;
+    bGross.textContent = fmt(grossAtSell, sym);
+    bBasis.textContent = `${basisLabel}: ${fmt(useTotal ? (grossAtSell - deposit) : (grossAtSell - stables), sym)}`;
+    bGain.textContent  = fmt(taxableGain, sym);
+    bTax.textContent   = fmt(tax, sym);
+    bNet.textContent   = fmt(netAfterTax, sym);
+
+    // Compare vs A
+    const diff = netAfterTax - a_withdraw;
+    diffEl.textContent = fmt(diff, sym);
+    diffEl.classList.toggle("good", diff >= 0);
+    diffEl.classList.toggle("bad", diff < 0);
+    diffHint.textContent = diff >= 0 ? "Extra vs Scenario A (positive = Dip better)" : "Loss vs Scenario A (negative = Dip worse)";
+  }
+
+  [currEl, depEl, stablesEl, dipEl, futureEl, taxEl, modeTotal].forEach(el => el.addEventListener("input", calc));
+  resetBtn.addEventListener("click", () => {
+    currEl.value = defaults.currency;
+    depEl.value = defaults.deposit;
+    stablesEl.value = defaults.stables;
+    dipEl.value = defaults.dip;
+    futureEl.value = defaults.future;
+    taxEl.value = defaults.tax;
+    modeTotal.checked = defaults.modeTotal;
+    calc();
+  });
+
+  // Initialize
+  if(!currEl.value) currEl.value = defaults.currency;
+  if(!depEl.value) depEl.value = defaults.deposit;
+  if(!stablesEl.value) stablesEl.value = defaults.stables;
+  if(!dipEl.value) dipEl.value = defaults.dip;
+  if(!futureEl.value) futureEl.value = defaults.future;
+  if(!taxEl.value) taxEl.value = defaults.tax;
+  modeTotal.checked = true;
+  calc();
+})();
+</script>
+</body>
+</html>
